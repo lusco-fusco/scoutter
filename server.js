@@ -1,12 +1,13 @@
 'user strict';
 
 // Requirements
+require('dotenv').config();
+
 const express = require('express');
 const bodyParser = require('body-parser');
 
 const url_analyzer = require('url');
-const environment = require('.env');
-
+const checkXApiKey = require('./auth-middleware.js');
 
 // Puppeteer framework
 const puppeteer = require('puppeteer-extra');
@@ -14,11 +15,11 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
 
 // Adds timestamps console logs
-require('console-stamp')(console, '[dd/mm/yyyy - HH:MM:ss.l]');
+require('console-stamp')(console, 'dd/mm/yyyy - HH:MM:ss.l');
 
 // Constants
-const PORT = environment.PORT;
-const HOST = environment.HOST;
+const PORT = process.env.PORT;
+const HOST = process.env.HOST;
 
 // App and its config
 const app = express();
@@ -27,6 +28,9 @@ app.use(bodyParser.json());         // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
+
+// check requests x-api-key
+app.use(checkXApiKey);
 
 // Blueprints
 app.post('/scan', (req, res) => {
