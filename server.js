@@ -5,7 +5,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const url_analyzer = require('url');
-const environment = require('.env');
 
 
 // Puppeteer framework
@@ -17,8 +16,8 @@ puppeteer.use(StealthPlugin());
 require('console-stamp')(console, '[dd/mm/yyyy - HH:MM:ss.l]');
 
 // Constants
-const PORT = environment.PORT;
-const HOST = environment.HOST;
+const PORT = '8080';
+const HOST = '0.0.0.0';
 
 // App and its config
 const app = express();
