@@ -1,4 +1,4 @@
-name: CI
+name: CD/CI
 on:
     push:
         branches:
@@ -8,13 +8,29 @@ jobs:
     build:
         runs-on: ubuntu-18.04
         steps:
-            - uses: actions/checkout@v1
-            - name: Build and deploy scoutter image
-            env:
-                HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-                APP_NAME: ${{ 'scoutter' }}
-            run:
-                cd ./scoutter
-                docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
-                heroku container:push web -a $APP_NAME
-                heroku container:release web -a $APP_NAME
+        - name: Check out Git repository
+          uses: actions/checkout@v1
+        - name: Set tp Node.js
+          uses: actions/setup-node@v1
+          with:
+              node-version: 12
+        - name: Install dependencies
+          run: npm install
+        - name: Run linters
+          uses: samuelmeuli/lint-action@v1
+          with:
+              github_token: ${{ secrets.github_token }}
+              eslint: true
+              prettier: true
+        - name: Build Scoutter image
+          env:
+            HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+            APP_NAME: ${{ 'amarrau-scoutter' }}
+          run: |
+            docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
+            heroku container:push web -a $APP_NAME
+        - name: Deploy Scoutter container
+          env:
+            APP_NAME: ${{ 'amarrau-scoutter' }}
+          run: |
+            heroku container:release web -a $APP_NAME
