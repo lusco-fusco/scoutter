@@ -4,7 +4,8 @@ require('dotenv').config();
 
 function checkXApiKey (req, res, next) {
     key = req.header('x-api-key');
-    if (key === process.env.X_API_KEY || process.env.X_API_KEY) {
+    console.log(process.env.X_API_KEY)
+    if (key === process.env.X_API_KEY) {
         // keep executing the router middleware
         next();
     } else {

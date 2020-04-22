@@ -1,8 +1,16 @@
 FROM node:12.14.1-stretch
 LABEL maintainers="Andrea Magan <andrea.magan@outlook.com>, Luis Lorenzo <luis.lorenzom@outlook.com>"
 
-# Create workdir and copy content
+# Arguments
+ARG PORT
+ARG X_API_KEY
+
+# Environment
+ENV PORT=${PORT}
+ENV X_API_KEY=${X_API_KEY}
 ENV HOME /home/scouter
+
+# Create workdir and copy content
 WORKDIR ${HOME}
 COPY . ${HOME}
 
@@ -15,7 +23,6 @@ libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release x
 
 # Install node dependencies
 RUN npm install
-
 
 # Set run command
 CMD ["npm", "run", "start"]
