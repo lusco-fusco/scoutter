@@ -114,3 +114,5 @@ app.post("/scan", (req, res) => {
 // ----------------------
 app.listen(PORT, HOST);
 console.info(`Running on http://${HOST}:${PORT}`);
+
+module.exports = app;

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon",
-    "lint": "npx eslint ./src/**/*.js"
+    "lint": "npx eslint ./src/**/*.js",
+    "test": "npx mocha test/scan.js --timeout 0"
   },
   "engines": {
     "node": "12.14.1",
@@ -15,9 +16,12 @@
   "author": "Andrea Magán Rey",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
     "console-stamp": "^0.2.9",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "moca": "^0.4.3",
     "puppeteer": "^2.1.1",
     "puppeteer-extra": "^3.1.9",
     "puppeteer-extra-plugin-stealth": "^2.4.9"
