@@ -33,76 +33,76 @@ app.use(
 );
 
 // Blueprints
-app.post("/scan", (req, res, next) => {
+app.post("/scan", async (req, res, next) => {
   // Who did the request
   let url = req.body.url;
   let req_ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   console.info(`${req_ip}\t~~>\t${url}`);
+  // Declare browser
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox"],
+  });
   (async () => {
-    // Declare browser
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox"],
-    });
-    const page = await browser.newPage();
+    try {
+      const page = await browser.newPage();
 
-    await page.goto(url).catch((res) => {
-      console.error("Failed", res);
-      // TODO: add exception handler
-    });
+      await page.goto(url);
 
-    // Serialized HTML of page DOM and wait until document is complete
-    console.log(`Waiting for document ready state`);
-    await page.waitForFunction('document.readyState === "complete"');
+      // Serialized HTML of page DOM and wait until document is complete
+      console.log(`Waiting for document ready state`);
+      await page.waitForFunction('document.readyState === "complete"');
 
-    // Extract data from DOM
-    let domain = url_analyzer.parse(url).hostname;
-    console.log(domain);
-    let productInfo = await page.evaluate((domain) => {
-      let currencyRegex = /\$|£|€|US \$/;
-      let name = "";
-      let price = "";
-      switch (true) {
-        // Ebay
-        case /www.ebay\.[a-z]{2,4}$/.test(domain):
-          name = document
-            .querySelector("#itemTitle")
-            .textContent.substr(14)
-            .trim();
-          price = parseFloat(
-            document
-              .querySelector('[itemprop="price"]')
-              .textContent.trim()
-              .replace(currencyRegex, " ")
-              .replace(",", ".")
-          );
-          break;
+      // Extract data from DOM
+      let domain = url_analyzer.parse(url).hostname;
+      console.log(domain);
+      let productInfo = await page.evaluate((domain) => {
+        let currencyRegex = /\$|£|€|US \$/;
+        let name = "";
+        let price = "";
+        switch (true) {
+          // Ebay
+          case /www.ebay\.[a-z]{2,4}$/.test(domain):
+            name = document
+              .querySelector("#itemTitle")
+              .textContent.substr(14)
+              .trim();
+            price = parseFloat(
+              document
+                .querySelector('[itemprop="price"]')
+                .textContent.trim()
+                .replace(currencyRegex, " ")
+                .replace(",", ".")
+            );
+            break;
 
-        // Amazon
-        case /www.amazon\.[a-z]{2,4}$/.test(domain):
-          name = document
-            .querySelector("#productTitle")
-            .textContent.substr(14)
-            .trim();
-          price = parseFloat(
-            document
-              .querySelector("#priceblock_ourprice")
-              .textContent.trim()
-              .replace(currencyRegex, " ")
-              .replace(",", ".")
-          );
-          break;
+          // Amazon
+          case /www.amazon\.[a-z]{2,4}$/.test(domain):
+            name = document
+              .querySelector("#productTitle")
+              .textContent.substr(14)
+              .trim();
+            price = parseFloat(
+              document
+                .querySelector("#priceblock_ourprice")
+                .textContent.trim()
+                .replace(currencyRegex, " ")
+                .replace(",", ".")
+            );
+            break;
 
-        default:
-          throw new Error("Error getting some product attribute");
-      }
-      return { name, price };
-    }, domain);
-    await browser.disconnect();
+          default:
+            throw new Error("Error getting some product attribute");
+        }
+        return { name, price };
+      }, domain);
 
-    // Response
-    res.send(productInfo);
-    return;
+      // Response
+      res.send(productInfo);
+      return;
+    } finally {
+      await browser.close();
+    }
   })().catch(next);
 });
 
