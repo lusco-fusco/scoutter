@@ -21,6 +21,10 @@ Checkout your potential mistakes:
 ```
 npm run linter
 ```
+Validate the project:
+```
+npm run test
+```
 
 ## 🛠 Development requirements
 * node == 12.14.1
