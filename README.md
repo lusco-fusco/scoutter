@@ -9,7 +9,7 @@ docker build -t scouter . --no-cache
 
 Deploy docker container
 ```sh
-docker run -p 8080:8080 --name scouter --restart always scouter
+docker run -e "X_API_KEY=SECRET_KEY" -p 8080:8080 --name scouter --restart always scouter
 ```
 
 ## 👩‍💻👨‍💻 Development notes

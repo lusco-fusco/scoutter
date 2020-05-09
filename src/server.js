@@ -5,6 +5,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const url_analyzer = require("url");
+const checkXApiKey = require("./middleware/auth-middleware.js");
 
 // Puppeteer framework
 const puppeteer = require("puppeteer-extra");
@@ -28,6 +29,9 @@ app.use(
     extended: true,
   })
 );
+
+// Check that requests have x-api-key
+app.use(checkXApiKey);
 
 // Blueprints
 app.post("/scan", (req, res) => {
