@@ -60,6 +60,8 @@ app.post("/scan", (req, res) => {
         let currencyRegex = /\$|£|€|US \$/;
         let name = "";
         let price = "";
+        let ecommerce = "";
+
         switch (true) {
           // Ebay
           case /www.ebay\.[a-z]{2,4}$/.test(domain):
@@ -74,6 +76,7 @@ app.post("/scan", (req, res) => {
                 .replace(currencyRegex, " ")
                 .replace(",", ".")
             );
+            ecommerce = "ebay";
             break;
 
           // Amazon
@@ -89,12 +92,13 @@ app.post("/scan", (req, res) => {
                 .replace(currencyRegex, " ")
                 .replace(",", ".")
             );
+            ecommerce = "amazon";
             break;
 
           default:
             throw new Error("Error getting some product attribute");
         }
-        return { name, price };
+        return { name, price, ecommerce };
       }, domain);
       await browser.disconnect();
 
