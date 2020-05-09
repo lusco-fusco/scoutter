@@ -7,6 +7,9 @@ const bodyParser = require("body-parser");
 const url_analyzer = require("url");
 const checkXApiKey = require("./middleware/auth-middleware.js");
 
+// Middleware
+const errorHandler = require("./middleware/error_handler.js");
+
 // Puppeteer framework
 const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
@@ -34,24 +37,21 @@ app.use(
 app.use(checkXApiKey);
 
 // Blueprints
-app.post("/scan", (req, res) => {
+app.post("/scan", async (req, res, next) => {
   // Who did the request
   let url = req.body.url;
   let req_ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   console.info(`${req_ip}\t~~>\t${url}`);
-  try {
-    (async () => {
-      // Declare browser
-      const browser = await puppeteer.launch({
-        headless: true,
-        args: ["--no-sandbox"],
-      });
+  // Declare browser
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox"],
+  });
+  (async () => {
+    try {
       const page = await browser.newPage();
 
-      await page.goto(url).catch((res) => {
-        console.error("Failed", res);
-        // TODO: add exception handler
-      });
+      await page.goto(url);
 
       // Serialized HTML of page DOM and wait until document is complete
       console.log(`Waiting for document ready state`);
@@ -104,18 +104,18 @@ app.post("/scan", (req, res) => {
         }
         return { name, price, ecommerce };
       }, domain);
-      await browser.disconnect();
 
       // Response
       res.send(productInfo);
       return;
-    })();
-  } catch (err) {
-    console.error(err);
-    res.status(500).send({ error: "Something failed!" });
-    return;
-  }
+    } finally {
+      await browser.close();
+    }
+  })().catch(next);
 });
+
+// Error handler
+app.use(errorHandler);
 
 // ----------------------
 // Main

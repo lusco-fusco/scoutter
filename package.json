@@ -2,7 +2,7 @@
   "name": "scouter",
   "version": "0.0.1",
   "description": "price scouter",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon",
