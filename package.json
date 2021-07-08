@@ -24,7 +24,8 @@
     "moca": "^0.4.3",
     "puppeteer": "^2.1.1",
     "puppeteer-extra": "^3.1.9",
-    "puppeteer-extra-plugin-stealth": "^2.4.9"
+    "puppeteer-extra-plugin-stealth": "^2.4.9",
+    "swagger-ui-express": "^4.1.4"
   },
   "devDependencies": {
     "nodemon": "^2.0.2",

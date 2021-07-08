@@ -18,6 +18,10 @@ puppeteer.use(StealthPlugin());
 // Adds timestamps console logs
 require("console-stamp")(console, "dd/mm/yyyy - HH:MM:ss.l");
 
+// Swagger
+var swaggerUi = require("swagger-ui-express");
+var swaggerDocument = require("./swagger.json");
+
 // Constants
 const PORT = process.env.PORT || 8080;
 const HOST = "0.0.0.0";
@@ -113,6 +117,9 @@ app.post("/scan", async (req, res, next) => {
     }
   })().catch(next);
 });
+
+// Api doc using swagger-ui
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Error handler
 app.use(errorHandler);
